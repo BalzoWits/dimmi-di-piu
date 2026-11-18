@@ -1,655 +1,84 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Draw a Card</title>
-  <style>
-    body {
-      font-family: 'Helvetica Neue', sans-serif;
-      background-color: #fdfdfd;
-      text-align: center;
-      padding: 1.5rem;
-      margin: 0;
-      color: #c0392b;
-    }
-    .hidden { display: none; }
-    h1 {
-      font-weight: bold;
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    h3 {
-      font-weight: bold;
-      font-size: 1.2rem;
-      color: #333;
-    }
-    .button {
-      padding: 0.8rem 1.5rem;
-      font-size: 1.1rem;
-      margin: 0.5rem;
-      border: none;
-      border-radius: 0.5rem;
-      background-color: #c0392b;
-      color: white;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-    }
-    .button:hover {
-      opacity: 0.9;
-    }
-    .button.level {
-      background-color: white;
-      border: 2px solid #c0392b;
-      color: #c0392b;
-    }
-    .button.level.active {
-      background-color: #c0392b;
-      color: white;
-    }
-    .card {
-      border: 2px solid #c0392b;
-      border-radius: 1rem;
-      padding: 3rem;
-      margin: 1rem auto;
-      width: calc(100% - 3rem);
-      max-width: 600px;
-      background-color: white;
-      font-size: 1.3rem;
-      color: #c0392b;
-      font-weight: bold;
-      box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
-      line-height: 1.4;
-      min-height: 12rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #status {
-      margin-top: 1rem;
-      color: #555;
-      font-size: 0.95rem;
-    }
-
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.6rem;
-      }
-      h3 {
-        font-size: 1rem;
-      }
-      .button {
-        width: 90%;
-        font-size: 1rem;
-      }
-      .card {
-        font-size: 1.1rem;
-        padding: 2rem;
-        min-height: 10rem;
-        width: 95%;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fff6f5">
+<title>Dimmi di più · Tell Me More</title>
+<meta name="description" content="Dimmi di più / Tell Me More: un gioco di carte per parlarsi davvero, in italiano e in inglese.">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,800;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-  <div id="modeScreen">
-    <h1>Select Mode</h1>
-    <button class="button" onclick="selectMode('standard')">Standard</button>
-    <button class="button" onclick="selectMode('selflove')">Self Love</button>
-    <button class="button" onclick="selectMode('xxx')">XXX</button>
+<body data-screen="home">
+
+<header class="bar">
+  <button class="icon-btn" id="back" aria-label="Indietro" data-i18n-aria="back">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
+  <a class="brand" href="#" id="brand">
+    <span class="mark" aria-hidden="true"><i></i><i></i></span>
+    <span class="brand-name" data-i18n="brand">Dimmi di più</span>
+  </a>
+  <div class="lang" role="group" aria-label="Lingua / Language">
+    <button data-lang="it">IT</button><button data-lang="en">EN</button>
   </div>
+</header>
 
-  <div id="gameScreen" class="hidden">
-    <h1>Draw a Card</h1>
-    <div>
-      <button class="button level" data-level="1">Level 1</button>
-      <button class="button level" data-level="2">Level 2</button>
-      <button class="button level" data-level="3">Level 3</button>
+<main>
+  <!-- scelta del mazzo -->
+  <section id="home" class="screen">
+    <div class="hero">
+      <p class="eyebrow" data-i18n="eyebrow"></p>
+      <h1 data-i18n="title"></h1>
+      <p class="lead" data-i18n="lead"></p>
     </div>
-    <button class="button" id="drawCardButton">Draw next card</button>
-    <div>
-      <h3>Current Card:</h3>
-      <div class="card" id="currentCard">—</div>
+    <div class="decks" id="decks"></div>
+    <p class="foot" data-i18n="foot"></p>
+  </section>
+
+  <!-- partita -->
+  <section id="game" class="screen">
+    <div class="game-head">
+      <div>
+        <p class="eyebrow" id="game-sub"></p>
+        <h2 id="game-title"></h2>
+      </div>
+      <button class="ghost" id="shuffle">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3.5c2 0 3.2 1 4.3 2.7l1.4 2.6c1 1.7 2.3 2.7 4.3 2.7H20M4 17h3.5c1.2 0 2.2-.4 3-1.1M13.5 8.1c.8-.7 1.8-1.1 3-1.1H20M17 4l3 3-3 3M17 14l3 3-3 3"/></svg>
+        <span data-i18n="shuffle"></span>
+      </button>
     </div>
-    <div>
-      <h3>Previous Card:</h3>
-      <div class="card" id="previousCard">—</div>
+
+    <div class="levels" id="levels" role="tablist"></div>
+
+    <div class="table">
+      <button class="nav prev" id="prev" aria-label="Carta precedente" data-i18n-aria="prev">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="stage" id="stage">
+        <div class="pile" aria-hidden="true"><span></span><span></span></div>
+      </div>
+      <button class="nav next" id="next-side" aria-label="Carta successiva" data-i18n-aria="next">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
     </div>
-    <div id="status">Select a mode to start.</div>
-  </div>
 
-  <script>
-    let allCards = {};
-    let allModes = {
-      standard: {1: [], 2: [], 3: []},
-      selflove: {1: [], 2: [], 3: []},
-      xxx: {1: [], 2: [], 3: []}
-    };
-    let usedCards = {1: [], 2: [], 3: []};
-    let currentLevel = 1;
-    let currentMode = "standard";
+    <div class="controls">
+      <div class="progress"><span id="bar"></span></div>
+      <div class="row">
+        <span class="count" id="count"></span>
+        <button class="draw" id="draw"><span data-i18n="draw"></span></button>
+        <span class="hint" id="hint"></span>
+      </div>
+    </div>
+  </section>
+</main>
 
-    const fullQuestions = {      standard: {
-    1: [
-      "What's something you're currently curious about?",
-      "What kind of first impression do you think you give?",
-      "What's your go-to small talk topic—and why?",
-      "What’s something you’ve recently realized about yourself?",
-      "Do you think I seem more introverted or extroverted?",
-      "When was the last time you felt truly at peace?",
-      "What’s a song that always puts you in a good mood?",
-      "What does your body language say about you right now?",
-      "What do you notice first when meeting someone new?",
-      "How do you define ‘connection’?",
-      "What’s something people often misunderstand about you?",
-      "Do you believe people can change?",
-      "What role do you usually take in group settings?",
-      "What's something you wish more people asked you?",
-      "What emotion do you show the most?",
-      "What’s one thing you want to be remembered for?",
-      "What’s something you’ve recently done for the first time?",
-      "When do you feel most like yourself?",
-      "What’s your favorite way to spend a Sunday?",
-      "What’s a compliment you love receiving?",
-      "Do you find silence uncomfortable or calming?",
-      "What's something you're working on within yourself?",
-      "Who in your life do you feel most seen by?",
-      "What do you admire in others that you wish you had more of?",
-      "How does your posture change when you feel confident?",
-      "What’s your love language—and does it align with how you express care to others?",
-      "How do you show someone you care without words?",
-      "Do you think I’m more of a thinker or a feeler?",
-      "What’s one question you’re afraid to ask but want to?",
-      "When do you feel most alive?",
-      "What’s one thing you wish you could tell your younger self?",
-      "What’s something you're proud of that you rarely talk about?",
-      "Do you believe in soulmates?",
-      "How do you define emotional safety?",
-      "When do you feel the need to hide parts of yourself?",
-      "What makes a conversation meaningful to you?",
-      "Have you ever surprised yourself?",
-      "Do you believe timing is everything?",
-      "What’s one boundary you’re learning to uphold?",
-      "What’s a personality trait you’re currently embracing?",
-      "What’s something you wish others could see in you more clearly?",
-      "If we met in another life, what do you think I’d be to you?",
-      "What makes someone instantly trustworthy to you?",
-      "What's a recent act of kindness you witnessed or gave?",
-      "What's something you learned too late?",
-      "Do you think people see you as you really are?",
-      "What does emotional availability look like to you?",
-      "What makes someone feel like home?",
-      "When do you feel most open to love?",
-      "Do you think I’m more driven by my head or my heart?"
-    ],
-    2: [
-      "What part of yourself have you worked hardest to accept?",
-      "When was the last time you felt deeply misunderstood?",
-      "How does your inner child show up in your adult relationships?",
-      "What’s something you've never said out loud but think often?",
-      "What’s your relationship with vulnerability?",
-      "Who hurt you the most without realizing it?",
-      "What’s something you're still healing from?",
-      "How has your definition of love changed over time?",
-      "What memory do you wish you could revisit just once?",
-      "What does being 'seen' mean to you?",
-      "What do you tend to overthink?",
-      "Have you ever been afraid of your own emotions?",
-      "What triggers you that you’re still working through?",
-      "What relationship taught you the most about yourself?",
-      "What kind of support do you need but rarely ask for?",
-      "When was the last time you felt truly connected to someone?",
-      "What’s a truth you’ve been avoiding?",
-      "What’s something you’ve forgiven someone for, but still remember?",
-      "What does your self-talk sound like on a bad day?",
-      "What does being emotionally intimate mean to you?",
-      "Have you ever lost yourself in a relationship?",
-      "What does your ideal friendship feel like?",
-      "What makes you feel emotionally safe in a relationship?",
-      "What’s something you’re scared others might judge you for?",
-      "When was the last time you truly cried—and why?",
-      "How do you process rejection?",
-      "What belief are you currently challenging within yourself?",
-      "Do you let people in easily?",
-      "When do you find it hardest to communicate how you feel?",
-      "What does healing currently look like for you?",
-      "Who has shaped your understanding of love the most?",
-      "How have your past relationships influenced your self-worth?",
-      "What’s something you still don’t fully understand about yourself?",
-      "What keeps you from feeling fully open?",
-      "Have you ever sabotaged something good? Why?",
-      "When was the last time you doubted your worth?",
-      "How do you react to emotional discomfort?",
-      "What’s something you're afraid of losing?",
-      "What story from your past still needs closure?",
-      "How often do you allow yourself to feel joy without guilt?",
-      "What does softness mean to you?",
-      "What boundary do you wish others would respect more?",
-      "What does your heart need right now?",
-      "What fear are you finally ready to release?",
-      "Who in your life are you afraid to disappoint?",
-      "What habit of yours holds you back from connection?",
-      "How do you handle someone not meeting your emotional needs?",
-      "Have you ever settled emotionally? Why?",
-      "What emotional risk are you currently avoiding?",
-      "If you could ask your younger self one thing, what would it be?"
-    ],
-    3: [
-      "What’s something you’ve never told anyone but want to share?",
-      "When was the last time you felt completely emotionally naked?",
-      "What truth about yourself have you only recently accepted?",
-      "What do you wish someone had said to you when you needed it most?",
-      "Describe a moment when you truly felt broken.",
-      "Who are you when no one’s watching?",
-      "What secret fear guides too many of your choices?",
-      "What version of yourself are you trying to forgive?",
-      "When was the last time you gave too much of yourself?",
-      "Have you ever felt love that terrified you?",
-      "What part of your story are you still scared to tell?",
-      "What does emotional intimacy feel like in your body?",
-      "When did you last betray your own needs for someone else?",
-      "What emotion do you struggle to express—and why?",
-      "What memory brings you to tears every time?",
-      "When do you feel most unlovable?",
-      "What pain do you carry that you’ve never shared?",
-      "What was your lowest emotional moment—and what did it teach you?",
-      "Have you ever lost yourself trying to be loved?",
-      "What part of yourself do you fear people will leave if they see?",
-      "What wound are you still learning to protect?",
-      "What would it take for you to fully trust again?",
-      "What’s something about your past you wish you could rewrite?",
-      "Have you ever broken your own heart?",
-      "Who do you still need to forgive to truly move on?",
-      "What belief about yourself are you trying to unlearn?",
-      "What truth about love hurts you the most?",
-      "What version of you feels most authentic—and why is it rare?",
-      "What did you need growing up that you never received?",
-      "Have you ever felt emotionally abandoned?",
-      "Describe the moment you realized someone didn’t love you back.",
-      "What part of yourself do you feel most disconnected from?",
-      "When was the last time you needed help and didn’t ask for it?",
-      "Have you ever been afraid of being truly known?",
-      "What do you long for most in connection?",
-      "What does ‘being held’ mean to you emotionally?",
-      "What’s a love you still grieve?",
-      "What do you need to hear right now—but are afraid to say aloud?",
-      "What part of your shadow self are you still hiding?",
-      "When have you felt safest being fully seen?",
-      "What would complete emotional honesty look like for you?",
-      "What keeps you from fully receiving love?",
-      "When did you feel most emotionally betrayed?",
-      "What mask are you tired of wearing?",
-      "What’s your most intimate emotional memory?",
-      "When have you loved someone more than they loved you?",
-      "What do you wish your past partners understood about your heart?",
-      "What fear keeps showing up in your relationships?",
-      "What story of love are you still telling yourself?",
-      "How do you know when your heart is open?"
-    ]
-      },
-
-      selflove: {
-  1: [
-    "How would you describe yourself in three kind words?",
-    "What part of yourself made you smile today?",
-    "What’s something you appreciate about your body right now?",
-    "When do you feel most confident?",
-    "What’s one small thing you did today that you’re proud of?",
-    "What does self-love look like to you today?",
-    "How do you celebrate your achievements?",
-    "What’s a positive habit you’ve recently developed?",
-    "What compliment do you often receive and love?",
-    "How do you comfort yourself on a tough day?",
-    "What’s a quality in yourself you’re learning to embrace?",
-    "What’s your favorite way to take care of yourself?",
-    "When do you feel most at peace with yourself?",
-    "What’s something new you’ve tried that made you feel good?",
-    "How do you express gratitude to yourself?",
-    "What’s one thing you forgive yourself for?",
-    "When do you feel most alive?",
-    "What’s a personal boundary you’ve learned to respect?",
-    "What do you love most about your personality?",
-    "What’s a recent moment you felt proud?",
-    "How do you show yourself kindness?",
-    "What’s one thing you want to celebrate about yourself this week?",
-    "What’s a favorite activity that helps you reconnect with yourself?",
-    "What does taking space for yourself look like?",
-    "What song makes you feel empowered?",
-    "How do you nurture your creativity?",
-    "When do you feel most connected to your intuition?",
-    "What’s something you’ve learned to accept about yourself?",
-    "What’s a habit that makes you feel healthier?",
-    "How do you recharge when you’re drained?",
-    "What’s a memory that reminds you of your strength?",
-    "What’s a kind thing you’ve told yourself recently?",
-    "When do you feel most authentic?",
-    "What’s something you admire in yourself?",
-    "How do you celebrate your uniqueness?",
-    "What’s a compliment you want to give yourself?",
-    "What does self-respect mean to you?",
-    "When do you feel most creative?",
-    "How do you practice patience with yourself?",
-    "What’s a small win you want to acknowledge today?",
-    "How do you honor your feelings?",
-    "What’s something you’re grateful your body can do?",
-    "How do you express love to yourself?",
-    "What’s a way you recharge emotionally?",
-    "What’s something you’re proud to have accomplished?",
-    "What’s a daily ritual that makes you feel cared for?",
-    "What’s a mindset shift you’ve made for your wellbeing?",
-    "When do you feel most energized?",
-    "What’s one thing you want to be more gentle with yourself about?",
-    "How do you practice self-compassion?"
-  ],
-  2: [
-    "What’s a limiting belief you’re learning to let go of?",
-    "When do you find it hardest to love yourself?",
-    "How do you handle self-doubt?",
-    "What’s a past mistake you’ve forgiven yourself for?",
-    "How do you nurture your mental health?",
-    "What does vulnerability mean in your self-love journey?",
-    "What’s a challenge you overcame that made you stronger?",
-    "When do you feel disconnected from yourself?",
-    "What’s a fear you’ve faced about your self-worth?",
-    "How do you remind yourself you’re enough?",
-    "What’s a moment you chose your wellbeing over others’ expectations?",
-    "When was the last time you set a boundary for your peace?",
-    "What’s a self-care practice that’s helped you heal?",
-    "How do you show yourself grace in failure?",
-    "What’s a story you tell yourself that no longer serves you?",
-    "What’s an area where you’re practicing patience with yourself?",
-    "How do you respond to negative self-talk?",
-    "What does emotional safety look like for you?",
-    "What part of your identity are you learning to love more?",
-    "What’s a habit that once held you back but you’re changing?",
-    "How do you handle feeling overwhelmed?",
-    "What does forgiveness toward yourself feel like?",
-    "What’s something you want to unlearn about yourself?",
-    "How do you remind yourself of your value on hard days?",
-    "What’s a source of strength within you you often forget?",
-    "When do you need to practice more self-compassion?",
-    "What’s a tough truth you’ve accepted about yourself?",
-    "How do you balance ambition and self-care?",
-    "What’s a boundary you find difficult but necessary?",
-    "What’s a recent insight you had about your emotions?",
-    "How do you process feelings of inadequacy?",
-    "What’s a part of your past you’re learning to embrace?",
-    "When was the last time you asked yourself ‘Am I being kind to me?’",
-    "What’s a way you celebrate progress, not perfection?",
-    "How do you speak to yourself in moments of failure?",
-    "What’s something you want to start appreciating more in yourself?",
-    "When do you feel your hardest critic is loudest?",
-    "What does self-acceptance feel like in your body?",
-    "How do you create space to listen to your needs?",
-    "What’s a way you surprise yourself with your resilience?",
-    "When was the last time you felt proud despite setbacks?",
-    "What does it mean to you to ‘put yourself first’?",
-    "How do you show yourself love when no one else does?",
-    "What’s a part of your personality you’ve learned to protect?",
-    "How do you find peace in imperfection?",
-    "What’s something you’re working on to love more deeply?",
-    "When do you feel most disconnected from your self-worth?",
-    "What’s a lesson self-love has taught you recently?"
-  ],
-  3: [
-    "Describe a time you chose yourself over seeking approval.",
-    "When was the last time you truly made peace with a mistake?",
-    "What’s a painful belief about yourself you’re healing from?",
-    "How has self-love transformed your relationships?",
-    "What part of your past self do you wish you could hug?",
-    "What’s a deep wound you’re learning to nurture?",
-    "When did you feel most vulnerable and how did you cope?",
-    "What’s something you’ve had to unlearn about love?",
-    "How do you forgive yourself for hurting someone you cared about?",
-    "What’s a story you tell yourself about your worthiness?",
-    "What does emotional intimacy with yourself look like?",
-    "When was the last time you felt truly whole alone?",
-    "What’s a part of your identity you’ve struggled to accept?",
-    "How do you navigate shame in your self-love journey?",
-    "What’s something you still fear others will discover about you?",
-    "When have you been your own hardest judge?",
-    "What’s a boundary you wish you had set earlier?",
-    "How do you comfort your inner critic?",
-    "What’s a limiting story about yourself you’re ready to rewrite?",
-    "When did you realize you deserved better?",
-    "How do you reclaim your power after pain?",
-    "What’s a truth about yourself you’ve only recently embraced?",
-    "What does radical self-acceptance mean to you?",
-    "When was the last time you chose healing over hiding?",
-    "How has self-love challenged your beliefs about perfection?",
-    "What part of your soul do you want to nurture more?",
-    "What’s a secret to yourself you’ve never shared?",
-    "How do you love yourself through your darkest days?",
-    "When did you realize your worth is unconditional?",
-    "What does being ‘enough’ mean to you now?",
-    "What’s a painful lesson self-love has taught you?",
-    "How do you protect your heart while staying open?",
-    "What’s something you’re still learning to forgive yourself for?",
-    "When have you felt proud to own your story?",
-    "What’s the kindest thing you’ve ever done for yourself?",
-    "How do you show love to your scars—visible or invisible?",
-    "What does your inner voice sound like at your best?",
-    "What’s a part of yourself you once hated but now cherish?",
-    "When was the last time you truly celebrated your growth?",
-    "How do you handle days when self-love feels impossible?",
-    "What’s a ritual that helps you reconnect with your soul?",
-    "What does it mean to fully accept your imperfections?",
-    "What’s a boundary you’ve set that saved you?",
-    "How do you love yourself without conditions?",
-    "When did you realize you are your own safe place?",
-    "What’s a story you want to tell your future self about self-love?",
-    "How has your relationship with yourself changed over time?"
-  ]
-      },
-      xxx: {
-  1: [
-    "What makes you feel most attractive?",
-    "Which part of my body do you find most intriguing?",
-    "When do you feel most desired?",
-    "What’s your favorite way to be touched?",
-    "What kind of scent do you find most appealing on someone?",
-    "How do you like to show affection?",
-    "What’s a subtle gesture that turns you on?",
-    "When do you feel most confident in your sensuality?",
-    "What’s your favorite way to flirt?",
-    "How do you express your desire non-verbally?",
-    "What’s something you’ve always wanted to try but haven’t yet?",
-    "What’s your favorite type of kiss?",
-    "How do you like to be approached?",
-    "What kind of clothing makes you feel sexy?",
-    "What’s a sensual activity you enjoy?",
-    "How do you like to unwind with a partner?",
-    "What’s a compliment about your sensuality that means a lot?",
-    "When do you feel most connected to your body?",
-    "What’s your favorite part of foreplay?",
-    "How do you like to tease someone?",
-    "What’s a fantasy you feel comfortable sharing?",
-    "What’s your favorite way to initiate intimacy?",
-    "How do you like to receive compliments?",
-    "What’s your favorite type of touch to give?",
-    "What’s your favorite way to relax after intimacy?",
-    "What’s something sensual you do just for yourself?",
-    "What’s a song that puts you in a sensual mood?",
-    "What’s a scent or smell that excites you?",
-    "What’s a movie scene that made you feel turned on?",
-    "How do you feel about slow, lingering touches?",
-    "What’s something you love about your own sensuality?",
-    "When do you feel most playful in intimacy?",
-    "What’s a secret pleasure you enjoy?",
-    "How do you like to explore your partner’s body?",
-    "What’s a part of your body you love being touched?",
-    "What’s your favorite kind of sensual massage?",
-    "How do you like to communicate desire?",
-    "What’s a subtle way you show interest in someone?",
-    "What’s your favorite way to build anticipation?",
-    "What’s something you’d love to try more often?",
-    "How do you feel about eye contact during intimacy?",
-    "What’s a small act that makes you feel loved?",
-    "How do you like to be comforted after intimacy?",
-    "What’s your favorite way to celebrate your body?",
-    "What’s a sensual habit you practice alone?",
-    "How do you like to explore your fantasies safely?",
-    "What’s a favorite scent or perfume that turns you on?",
-    "How do you feel about vulnerability in intimacy?",
-    "What’s your favorite way to express passion?",
-    "What’s something you find irresistible in a partner?"
-  ],
-  2: [
-    "Tell me about your sweetest fantasy.",
-    "How do you like to be touched when you want to feel loved?",
-    "What’s a sensual experience that surprised you?",
-    "How do you explore your sensuality with a partner?",
-    "What’s a boundary you’ve set to protect your intimacy?",
-    "How do you communicate your desires clearly?",
-    "What’s a moment when you felt deeply desired?",
-    "How do you handle feeling vulnerable during intimacy?",
-    "What’s a way you express your sensuality that feels authentic?",
-    "What’s a fantasy you’ve never shared before?",
-    "How do you like to build emotional intimacy?",
-    "What’s a favorite memory involving touch and connection?",
-    "How do you feel about exploring new sensations?",
-    "What’s a sensual activity that connects you to your body?",
-    "What’s a way your partner can make you feel safe?",
-    "How do you feel about mixing emotional and physical intimacy?",
-    "What’s something you want to discover about yourself sensually?",
-    "How do you respond to gentle teasing?",
-    "What’s a moment when you felt completely free in your sensuality?",
-    "How do you balance passion and tenderness?",
-    "What’s a fantasy that feels empowering to you?",
-    "How do you communicate your limits in intimacy?",
-    "What’s a way you like to surprise your partner?",
-    "How do you reconnect with yourself after intimacy?",
-    "What’s a way you like to express sensuality outside of the bedroom?",
-    "What’s something you’ve learned about your desires recently?",
-    "How do you handle shame or embarrassment around your sensuality?",
-    "What’s a song or music that makes you feel sensual?",
-    "How do you nurture your sensual self when single?",
-    "What’s a part of your sensuality you’re curious to explore?",
-    "What’s a fantasy that you feel proud to own?",
-    "How do you feel about sensual rituals or routines?",
-    "What’s a way you like to feel adored?",
-    "How do you enjoy flirting beyond physical touch?",
-    "What’s a story of a moment when you felt deeply connected?",
-    "How do you set the mood for intimacy?",
-    "What’s a scent or environment that helps you relax sensually?",
-    "How do you handle differences in desire with a partner?",
-    "What’s a sensual book or film that inspired you?",
-    "How do you explore vulnerability in physical connection?",
-    "What’s a way you practice self-pleasure that feels special?",
-    "How do you feel about sharing fantasies with someone?",
-    "What’s something you want more of in your intimate life?",
-    "How do you express affection when words aren’t enough?",
-    "What’s a way you stay present during intimate moments?",
-    "How do you feel about sensual touch in public or semi-public?",
-    "What’s a way your body communicates desire to you?",
-    "How do you feel when your partner initiates intimacy unexpectedly?"
-  ],
-  3: [
-    "Describe the most intense intimate moment you’ve experienced.",
-    "Have you ever felt a physical connection so strong it made you tremble?",
-    "If you could write a sensual letter to yourself, what would you say?",
-    "What’s a fantasy you’ve been too shy to share?",
-    "How do you navigate feelings of shame in your sensual experiences?",
-    "What’s a moment when vulnerability deepened your connection?",
-    "How do you express desire in ways that feel deeply authentic?",
-    "What’s a boundary you’ve broken to explore passion?",
-    "Have you ever experienced intimacy that changed you?",
-    "What’s a part of your sensual self that you’re still learning to accept?",
-    "How do you balance power and softness in your intimate moments?",
-    "What’s a secret desire you feel safe sharing now?",
-    "Describe a time you felt completely seen in your sensuality.",
-    "How do you reclaim your sensuality after trauma or pain?",
-    "What’s a moment when trust made intimacy unforgettable?",
-    "How do you handle fear of rejection in your intimate life?",
-    "What’s a way you surprise yourself with your desires?",
-    "Describe a sensual experience that shifted your perspective on love.",
-    "What does surrender mean to you in intimacy?",
-    "Have you ever felt so connected you forgot time and space?",
-    "How do you nurture your sensual wounds?",
-    "What’s a moment you wish you could relive?",
-    "How do you express love when words fall short during intimacy?",
-    "What’s a taboo you’ve embraced about your sensuality?",
-    "How do you handle feelings of vulnerability after intimacy?",
-    "What’s a way your body has taught you about pleasure?",
-    "Describe an experience where you felt deeply empowered sensually.",
-    "How do you integrate your sensuality into your identity?",
-    "What’s a fantasy that reflects your true desires?",
-    "How do you stay present when overwhelmed by passion?",
-    "What’s a way you practice radical self-love through intimacy?",
-    "Describe a time when intimacy healed an old wound.",
-    "How do you honor your needs and limits during passion?",
-    "What’s a secret about your sensual self you cherish?",
-    "How do you communicate when words aren’t enough in intimacy?",
-    "Describe a moment when sensuality and vulnerability intertwined.",
-    "What does being fully seen in intimacy feel like?",
-    "How do you nurture trust after betrayal or hurt?",
-    "What’s a way you’ve surprised a partner with your desires?",
-    "Describe your ideal intimate connection without limits.",
-    "How do you feel about your sensual power?",
-    "What’s a moment when you felt your body and soul align?",
-    "How do you reclaim joy in your sensual life?",
-    "Describe the feeling of unconditional acceptance in intimacy.",
-    "What’s a lesson your sensual experiences have taught you?",
-    "How do you make space for pleasure and healing simultaneously?",
-    "What’s a way you celebrate your sensuality daily?",
-    "Describe a time when intimacy felt like a sacred act."
-  ]
-      }
-    };
-
-    function selectMode(mode) {
-      currentMode = mode;
-      allCards = JSON.parse(JSON.stringify(fullQuestions[mode]));
-      usedCards = {1: [], 2: [], 3: []};
-      document.getElementById('modeScreen').classList.add('hidden');
-      document.getElementById('gameScreen').classList.remove('hidden');
-      updateLevelButtons();
-      updateStatus();
-    }
-
-    function setLevel(level) {
-      currentLevel = level;
-      updateLevelButtons();
-      updateStatus();
-    }
-
-    function updateLevelButtons() {
-      document.querySelectorAll('.button.level').forEach(btn => {
-        btn.classList.remove('active');
-        if (parseInt(btn.getAttribute('data-level')) === currentLevel) {
-          btn.classList.add('active');
-        }
-      });
-    }
-
-    function drawCard() {
-      const available = allCards[currentLevel];
-      if (!available || available.length === 0) {
-        alert("No more cards for level " + currentLevel);
-        return;
-      }
-      const index = Math.floor(Math.random() * available.length);
-      const cardText = available.splice(index, 1)[0];
-      usedCards[currentLevel].push(cardText);
-
-      document.getElementById('previousCard').textContent = document.getElementById('currentCard').textContent;
-      document.getElementById('currentCard').textContent = cardText;
-      updateStatus();
-    }
-
-    function updateStatus() {
-      const remaining = allCards[currentLevel]?.length ?? 0;
-      const used = usedCards[currentLevel]?.length ?? 0;
-      document.getElementById('status').textContent = `Mode: ${currentMode} — Level ${currentLevel} — Remaining: ${remaining}, Drawn: ${used}`;
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-      document.querySelectorAll(".button.level").forEach(btn => {
-        btn.addEventListener("click", () => {
-          setLevel(parseInt(btn.getAttribute("data-level")));
-        });
-      });
-      document.getElementById("drawCardButton").addEventListener("click", drawCard);
-    });
-  </script>
+<script src="js/decks.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
